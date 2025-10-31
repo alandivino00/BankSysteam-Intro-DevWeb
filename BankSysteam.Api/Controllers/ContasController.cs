@@ -2,6 +2,7 @@
 using BankSysteam.Api;
 using BankSysteam.Api.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BankSysteam.Api.Controllers
 {
@@ -17,19 +18,49 @@ namespace BankSysteam.Api.Controllers
             new Conta(3, "Ana", 800.00m)
         };
 
-        // Ação GET: retorna a lista de contas
+        // GET: retorna todas as contas (como ViewModel)
         [HttpGet]
-        public ActionResult<IEnumerable<Conta>> GetContas()
+        public ActionResult<IEnumerable<ContaViewModel>> GetContas()
         {
-            return Ok(contas);
+            var vms = contas.Select(c => new ContaViewModel
+            {
+                Numero = c.Numero,
+                Titular = c.Titular,
+                Saldo = c.Saldo
+            });
+
+            return Ok(vms);
         }
 
-        // Ação POST: recebe InputModel, adiciona e retorna ViewModel
+        // GET: retorna uma conta por número
+        [HttpGet("{numero}")]
+        public ActionResult<ContaViewModel> GetConta(int numero)
+        {
+            var conta = contas.FirstOrDefault(c => c.Numero == numero);
+            if (conta == null)
+                return NotFound();
+
+            var vm = new ContaViewModel
+            {
+                Numero = conta.Numero,
+                Titular = conta.Titular,
+                Saldo = conta.Saldo
+            };
+
+            return Ok(vm);
+        }
+
+        // POST: cria nova conta, valida e retorna 201 com Location
         [HttpPost]
         public ActionResult<ContaViewModel> CreateConta([FromBody] ContaInputModel input)
         {
             if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var exists = contas.Any(c => c.Numero == input.Numero);
+            if (exists)
             {
+                ModelState.AddModelError(nameof(input.Numero), "Número de conta já existe.");
                 return BadRequest(ModelState);
             }
 
@@ -43,7 +74,7 @@ namespace BankSysteam.Api.Controllers
                 Saldo = conta.Saldo
             };
 
-            return CreatedAtAction(nameof(GetContas), null, vm);
+            return CreatedAtAction(nameof(GetConta), new { numero = conta.Numero }, vm);
         }
     }
 }
