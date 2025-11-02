@@ -3,6 +3,7 @@ using BankSysteam.Api;
 using BankSysteam.Api.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 
 namespace BankSysteam.Api.Controllers
 {
@@ -75,6 +76,41 @@ namespace BankSysteam.Api.Controllers
             };
 
             return CreatedAtAction(nameof(GetConta), new { numero = conta.Numero }, vm);
+        }
+
+        // PUT: acrescenta saldo na conta especificada
+        [HttpPut("{numero}/deposito")]
+        public ActionResult<ContaViewModel> Deposito(int numero, [FromBody] DepositoInputModel input)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var conta = contas.FirstOrDefault(c => c.Numero == numero);
+            if (conta == null)
+                return NotFound(); // 404 quando conta não encontrada          
+
+            conta.Saldo += input.Valor;
+
+            var vm = new ContaViewModel
+            {
+                Numero = conta.Numero,
+                Titular = conta.Titular,
+                Saldo = conta.Saldo
+            };
+
+            return Ok(vm); // 200 com a conta atualizada
+        }
+
+        // DELETE: remove conta por número
+        [HttpDelete("{numero}")]
+        public IActionResult DeleteConta(int numero)
+        {
+            var conta = contas.FirstOrDefault(c => c.Numero == numero);
+            if (conta == null)
+                return NotFound(); // 404 quando não encontrada
+
+            contas.Remove(conta);
+            return NoContent(); // 204 quando removida com sucesso
         }
     }
 }
