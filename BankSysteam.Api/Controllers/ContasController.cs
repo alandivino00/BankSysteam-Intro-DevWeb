@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BankSysteam.Api;
 using BankSysteam.Api.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using BankSysteam.Api.models;
 
 namespace BankSysteam.Api.Controllers
 {
@@ -14,9 +14,9 @@ namespace BankSysteam.Api.Controllers
         // Lista em memória simulando dados do banco
         private static readonly List<Conta> contas = new List<Conta>
         {
-            new Conta(1, "João", 1200.50m),
-            new Conta(2, "Maria", 3500.75m),
-            new Conta(3, "Ana", 800.00m)
+            new Conta(1, 1200.50m),
+            new Conta(2, 3500.75m),
+            new Conta(3, 800.00m)
         };
 
         // GET: retorna todas as contas (como ViewModel)
@@ -25,8 +25,7 @@ namespace BankSysteam.Api.Controllers
         {
             var vms = contas.Select(c => new ContaViewModel
             {
-                Numero = c.Numero,
-                Titular = c.Titular,
+                Numero = c.Numero,               
                 Saldo = c.Saldo
             });
 
@@ -43,8 +42,7 @@ namespace BankSysteam.Api.Controllers
 
             var vm = new ContaViewModel
             {
-                Numero = conta.Numero,
-                Titular = conta.Titular,
+                Numero = conta.Numero,                
                 Saldo = conta.Saldo
             };
 
@@ -65,13 +63,12 @@ namespace BankSysteam.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var conta = new Conta(input.Numero, input.Titular, input.Saldo);
+            var conta = new Conta(input.Numero, input.Saldo);
             contas.Add(conta);
 
             var vm = new ContaViewModel
             {
-                Numero = conta.Numero,
-                Titular = conta.Titular,
+                Numero = conta.Numero,                
                 Saldo = conta.Saldo
             };
 
@@ -93,8 +90,7 @@ namespace BankSysteam.Api.Controllers
 
             var vm = new ContaViewModel
             {
-                Numero = conta.Numero,
-                Titular = conta.Titular,
+                Numero = conta.Numero,               
                 Saldo = conta.Saldo
             };
 

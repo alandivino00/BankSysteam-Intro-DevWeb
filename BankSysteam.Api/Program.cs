@@ -1,3 +1,6 @@
+using BankSysteam.Api.data;
+using Microsoft.EntityFrameworkCore;
+
 public class Program
 {
     public static void Main(string[] args)
@@ -6,6 +9,10 @@ public class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        
+        builder.Services.AddDbContext<BankContext>(options =>
+          options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
+
 
         // Add services to the container.
 
@@ -29,6 +36,19 @@ public class Program
 
 
         app.MapControllers();
+
+        app.MapGet("/health", async (BankContext context) =>
+        {
+            try
+            {
+                await context.Database.CloseConnectionAsync();
+                return Results.Ok("Meu banco esta funcionando.");
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Meu banco falhou: {ex.Message}");
+            }
+        });
 
         app.Run();
     }
