@@ -4,13 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using BankSysteam.Api.models;
+using BankSysteam.Api.data;
+using System.Threading.Tasks;
 
 namespace BankSysteam.Api.Controllers
 {
     [ApiController]
     [Route("api/contas")]
-    public class ContasController : ControllerBase
+    public class ContasController(BankContext context) : ControllerBase
     {
+        
+        
         // Lista em memória simulando dados do banco
         private static readonly List<Conta> contas = new List<Conta>
         {
@@ -51,7 +55,7 @@ namespace BankSysteam.Api.Controllers
 
         // POST: cria nova conta, valida e retorna 201 com Location
         [HttpPost]
-        public ActionResult<ContaViewModel> CreateConta([FromBody] ContaInputModel input)
+        public async Task<ActionResult<ContaViewModel>> CreateConta([FromBody] ContaInputModel input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -64,7 +68,9 @@ namespace BankSysteam.Api.Controllers
             }
 
             var conta = new Conta(input.Numero, input.Saldo);
-            contas.Add(conta);
+            //contas.Add(conta);
+            await context.AddAsync(conta);
+            await context.SaveChangesAsync();
 
             var vm = new ContaViewModel
             {

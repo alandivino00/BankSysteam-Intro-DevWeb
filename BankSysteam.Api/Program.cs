@@ -39,15 +39,20 @@ public class Program
 
         app.MapGet("/health", async (BankContext context) =>
         {
+            bool canConnect;
             try
             {
-                await context.Database.CloseConnectionAsync();
-                return Results.Ok("Meu banco esta funcionando.");
+                canConnect = await context.Database.CanConnectAsync();
             }
-            catch (Exception ex)
+            catch 
             {
-                return Results.Problem($"Meu banco falhou: {ex.Message}");
+                canConnect = false;
             }
+
+            if (canConnect)
+                return Results.Ok("Meu banco esta funcionando.");
+
+            return Results.Problem("Meu banco falhou");
         });
 
         app.Run();
