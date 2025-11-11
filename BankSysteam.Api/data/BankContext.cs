@@ -10,6 +10,8 @@ namespace BankSysteam.Api.data
        {
         
        }
+        //public DbSet<Account> Accounts { get; set; }
+        public DbSet<Cliente> Clients { get; set; }
 
         public DbSet<Conta> Contas { get; set; }
 
@@ -18,13 +20,23 @@ namespace BankSysteam.Api.data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Conta>(entity =>
             {
-                entity.HasKey(e => e.id);
+                entity.HasKey(e => e.Id);
                 entity.Property(e => e.Numero).IsRequired().HasMaxLength(20);
-                //entity.Property(e => e.Titular).IsRequired();
-                entity.Property(e => e.Saldo).IsRequired().HasColumnType("decimal(18,2)");
-                entity.Property(e => e.Tipo).IsRequired();
-                entity.Property(e => e.DataCriacao).IsRequired();
+                entity.Property(e => e.Balance).IsRequired().HasColumnType("decimal(18,2)");
+                entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.Tipo).IsRequired();
+
+                entity.HasOne(e => e.Cliente)
+                      .WithMany(a => a.Conta)
+                      .HasForeignKey(e => e.ClienteId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Cliente>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nome).IsRequired();
+                entity.Property(e => e.Email).IsRequired();
             });
         }
     }
