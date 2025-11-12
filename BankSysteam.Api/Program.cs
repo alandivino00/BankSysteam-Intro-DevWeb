@@ -20,6 +20,9 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         //builder.Services.AddOpenApi();
 
+        builder.Services.AddScoped<BankSysteam.Api.Repositories.IContaRepository, BankSysteam.Api.Repositories.ContaRepository>();
+        builder.Services.AddScoped<BankSysteam.Api.Service.IContaService, BankSysteam.Api.Service.ContaService>();
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

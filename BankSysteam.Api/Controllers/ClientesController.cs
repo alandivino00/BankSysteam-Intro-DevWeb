@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BankSysteam.Api.data;
 using BankSysteam.Api.models;
-using BankSysteam.Api.data;
-using System.Threading.Tasks;
+using BankSysteam.Api.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Threading.Tasks;
 
 namespace BankSysteam.Api.Controllers
 {
@@ -13,21 +14,18 @@ namespace BankSysteam.Api.Controllers
     {
         private readonly BankContext _context;
 
-       
         public ClientesController(BankContext context)
         {
             _context = context;
         }
-        
 
         // POST: criar novo cliente
         [HttpPost]
-        public async Task<ActionResult<Cliente>> CreateCliente([FromBody] Cliente input)
+        public async Task<ActionResult<Cliente>> CreateCliente([FromBody] ClienteInputModel input)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Basic uniqueness check on email (optional)
             var exists = await _context.Clients.AsNoTracking().AnyAsync(c => c.Email == input.Email);
             if (exists)
             {
