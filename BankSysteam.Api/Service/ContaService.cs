@@ -71,6 +71,9 @@ namespace BankSysteam.Api.Service
 
         public async Task<ContaViewModel?> DepositoAsync(string numero, decimal valor)
         {
+            if (valor <= 0)
+                throw new ArgumentException("Valor de depósito deve ser maior que zero.", nameof(valor));
+
             var conta = await _repo.GetByNumeroAsync(numero, asNoTracking: false);
             if (conta == null) return null;
 
@@ -87,7 +90,8 @@ namespace BankSysteam.Api.Service
         public async Task<bool> DeleteContaAsync(string numero)
         {
             var conta = await _repo.GetByNumeroAsync(numero);
-            if (conta == null) return false;
+            if (conta == null) 
+                throw new InvalidOperationException("Conta não encontrada.");
 
             await _repo.DeleteAsync(conta);
             return true;
