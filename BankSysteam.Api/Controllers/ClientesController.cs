@@ -1,6 +1,7 @@
 ﻿using BankSysteam.Api.data;
 using BankSysteam.Api.models;
 using BankSysteam.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,26 +10,33 @@ using System.Threading.Tasks;
 namespace BankSysteam.Api.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "Admin")]
     [Route("api/clientes")]
     public class ClientesController : ControllerBase
     {
         private readonly BankContext _context;
 
-        public ClientesController(BankContext context)
+        private readonly ILogger<ClientesController> _logger;
+
+        public ClientesController(BankContext context, ILogger<ClientesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // POST: criar novo cliente
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<Cliente>> CreateCliente([FromBody] ClienteInputModel input)
         {
+            throw new Exception("Teste Sentry");
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var exists = await _context.Clients.AsNoTracking().AnyAsync(c => c.Email == input.Email);
             if (exists)
             {
+                _logger.LogWarning("Tentativa de cadastro de email já existente: {Email}", input.Email);
                 ModelState.AddModelError(nameof(input.Email), "Email já cadastrado.");
                 return BadRequest(ModelState);
             }

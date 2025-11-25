@@ -65,8 +65,7 @@ namespace BankSysteam.Unit.Test
         [Fact]
         public async Task GetAllContaAsync_DeveRetornarUmaExcecao_QuandoObjetoForNulo()
         {
-            // Arrange
-            // The repository method is `GetAllAsync(...)` so mock that to throw.
+            // Arrange            
             _contaRepositoryMock
                .Setup(repo => repo.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
                .ThrowsAsync(new ArgumentNullException("repository"));
